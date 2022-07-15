@@ -1,0 +1,31 @@
+{% extends "index.html" %}
+{% block content %}
+<form method="POST">
+  {% csrf_token %}
+<div class="wrapper">
+    <div class="title">
+      Delete A Question
+    </div>
+    <div class="form">
+        <div class="inputfield">
+          {%if message%}
+          <label>{{message}}</label>
+          {%else%}
+         <label>Select Question</label>
+         <div class="custom_select">
+           <select name="qno" required >
+             <option value="">Select</option>
+             {% for ques in response%}
+             <option value="{{ques.Qid}}">{{ques.question}}</option>
+             {% endfor%}
+           </select>
+         </div>
+        </div> 
+        <div class="inputfield">
+          <input type="submit" value="submit" class="btn" id="Button"  >
+        </div>
+        {%endif%}
+    </div>
+</div>
+</form>	
+{% endblock %}

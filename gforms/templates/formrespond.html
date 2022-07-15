@@ -1,0 +1,89 @@
+{% extends "index.html" %}
+{% block content %}
+
+
+<form method="POST">
+    {% csrf_token %}
+    <div class="wrapper">
+       
+        <div class="title">
+            {{title}}
+        </div>
+        <div class="form">
+            {% if message %}
+            <div class="inputfield">
+                <label>{{message}}</label>
+            </div>
+            {% else %}
+            {%if description%}
+            <div class="inputfield">
+                <p>Descprition : {{description}}</p>
+            </div> 
+            {%endif%}
+            
+            {% for ques  in questions%}
+                    {% if ques.Type == "Short answer" or ques.Type == "Paragraph"  %}
+                        <div class="inputfield">
+                            <label>{{ques.question}}</label>
+                        </div>
+                        <div class="inputfield">
+                            <textarea {{ques.required}} name="{{ques.Qid}}"class="textarea"></textarea>
+                        </div>  
+                    {% elif ques.Type == "Checkbox"%}
+                    <div class="inputfield">
+                        <label>{{ques.question}}</label>
+                        </div>
+                        <div class="inputfield">
+                        <div class="options">
+                          {% for i in ques.options%}
+                          <div class="options">
+                          <input {{ques.required}} type="checkbox" id="{{i}}" class="check" name={{ques.Qid}} value={{i}}>
+                          <label for="{{i}}">{{i}}</label>
+                          </div>
+                          {%endfor%}
+                        </div>
+                     </div>
+                     {% elif ques.Type == "Multiple Choice" or ques.Type ==  "Linear scale"%}
+                     <div class="inputfield">
+                         <label>{{ques.question}}</label>
+                        </div>
+                        <div class="inputfield">
+                            <div class="options">
+                           {% for i in ques.options%}
+                           <div>
+                            <input {{ques.required}} type="radio"  class="check" name={{ques.Qid}} value={{i}}>
+                           <label for="{{ques.Qid}}">{{i}}</label>
+                           </div>
+                           {%endfor%}
+                        </div>
+                      </div>
+                    {% elif ques.Type == "date" or ques.Type == "time" %}
+                        <div class="inputfield">
+                            <label>{{ques.question}}</label>
+                             <input {{ques.required}} name="{{ques.Qid}}" type="{{ques.Type}}" class="input">
+                        </div>  
+                    {%elif ques.Type == "Drop-down" %}
+                        <div class="inputfield">
+                            <label>{{ques.question}}</label>
+                                <div class="custom_select">
+                                    <select name="{{ques.Qid}}"{{ques.required}}>
+                                        <option value="">Select</option>
+                                        {% for  i in ques.options%}
+                                            <option value="{{i}}">{{i}}</option>
+                                        {%endfor %}
+                                    </select>
+                                </div>
+                            </div> 
+                    {%endif %}
+            {%endfor%}
+            
+            <div class="inputfield">
+                <input type="submit" value="Submit" class="btn" id="Button">
+            </div>
+        </div>
+        {%endif%}
+
+    </div>
+</form>
+
+{% endblock %}

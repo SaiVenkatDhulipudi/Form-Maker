@@ -1,0 +1,28 @@
+{% extends "index.html" %}
+{% block content %}
+<form method="POST">
+  {% csrf_token %}
+<div class="wrapper">
+    <div class="title">
+      Basic Form Details
+    </div>
+    <div class="form">
+       <div class="inputfield">
+          <label>Form Title</label>
+          <input required name="ftitle" type="text" class="input">
+       </div>  
+        <div class="inputfield">
+          <label>Form Description</label>
+          <textarea  name="fdesc"class="textarea"></textarea>
+        </div>
+      <!-- <div class="inputfield">
+        <label>Number of Questions</label>
+        <input required name="qnos" type="text" class="input">
+      </div>   -->
+      <div class="inputfield">
+        <input type="submit" value="Create Questions" class="btn" id="Button"  >
+      </div>
+      
+</div>
+</form>	
+{% endblock %}

@@ -1,0 +1,20 @@
+{% extends "index.html" %}
+{% block content %}
+<form  method="POST">
+  {% csrf_token %}
+  <div class="wrapper">
+    <div class="title">
+      Question 
+    </div>
+    <div class="form"> 
+    <div class="inputfield">
+        <label>No of Options</label>
+        <input required name="optionno" type="number" min="2" class="input">
+    </div> 
+      <div class="inputfield">
+        <input type="submit" value="Next" class="btn" id="Button"  >
+      </div>
+    </div>
+</div>
+</form>	
+{% endblock %}

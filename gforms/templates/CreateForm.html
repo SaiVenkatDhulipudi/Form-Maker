@@ -1,0 +1,49 @@
+{% extends "index.html" %}
+{% block content %}
+
+<form  method="POST">
+  {% csrf_token %}
+<div class="wrapper">
+    <div class="title">
+      Question
+    </div>
+    <div class="form"> 
+        <div class="inputfield">
+          <label>Type of Question</label>
+          <div class="custom_select">
+            <select name="Typeofque" required id="toq">
+              <option value="">Select</option>
+              <option value="Short answer">Short answer</option>
+              <option value="Paragraph">Paragraph</option>
+              <option value="Multiple Choice">Multiple Choice</option>
+              <option value="Checkbox">Checkbox</option>
+              <option value="Drop-down">Drop-down</option>
+              <option value="Linear scale">Linear scale</option>
+              <option value="Tick box grid">Tick box grid</option>
+              <option value="Mutiple-choice grid">Mutiple-choice grid</option>
+              <option value="date">Date</option>
+              <option value="time">Time</option>
+            </select>
+          </div>
+       </div> 
+       <div class="inputfield">
+         <label>Enter Question</label>
+         <textarea required name="question"class="textarea"></textarea>
+        </div>   
+        <div class="inputfield">
+         <label>Make Mandatory</label>
+         <div class="custom_select">
+           <select name="required" required >
+             <option value="">Select</option>
+             <option value="True">Yes</option>
+             <option value="False">No</option>
+           </select>
+         </div>
+      </div> 
+      <div class="inputfield">
+        <input type="submit" value="next" class="btn" id="Button">
+      </div>
+    </div>
+</div>
+</form>	
+{% endblock %}

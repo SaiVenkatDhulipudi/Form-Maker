@@ -1,0 +1,46 @@
+{% extends "index.html" %}
+{% block content %}
+<form  method="POST">
+  {% csrf_token %}
+  <div class="wrapper">
+    <div class="title">
+      Question
+    </div>
+    <div class="form">   
+      {% if status %}
+      <div class="inputfield">
+        <label>Select Lower Value</label>
+        <div class="custom_select">
+          <select name="low" required >
+            <option value="">Select</option>
+            <option value="0">0</option>
+            <option value="1">1</option>
+          </select>
+        </div>
+      </div>
+      <div class="inputfield">
+        <label>Select Higher Value</label>
+        <div class="custom_select">
+          <select name="high" required >
+            <option value="">Select</option>
+            <option value="5">5</option>
+            <option value="10">10</option>
+          </select>
+        </div>
+      </div>
+      {%endif%}
+        {% for i in nos %} 
+        <div class="inputfield">
+            <label>Enter option {{i}}</label>
+            <input required name="value{{i}}" type="text" class="input">
+         </div>
+      {% endfor %}
+    <div class="inputfield">
+        <input type="submit" value="Submit" class="btn" id="Button"  >
+      </div>
+      
+    </div>
+
+</div>
+</form>	
+{% endblock %}

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+{% load static %}
+  <meta charset="UTF-8">
+  <title>Form Maker</title>
+  <link rel="stylesheet" href="{% static 'css/index.css' %}">
+  <link rel="stylesheet" href="{% static 'css/form.css' %}">
+  <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,600' rel='stylesheet' type='text/css'>
+
+</head>
+<body>
+<!-- partial:index.partial.html -->
+<header class="header">
+	<div class="container">
+		<nav class="navbar">
+			<a href="#" class="brand">Form Maker</a>
+			<div class="burger" id="burger">
+				<span class="burger-line"></span>
+				<span class="burger-line"></span>
+				<span class="burger-line"></span>
+			</div>
+			<span class="overlay"></span>
+			<div class="menu" id="menu">
+				<ul class="menu-inner">
+					<li class="menu-item"><a class="menu-link" href="{%url 'home'%}">Home</a></li>
+					<li class="menu-item"><a class="menu-link" href="{%url 'preform'%}">Create Form</a></li>
+					<li class="menu-item"><a class="menu-link" href="{%url 'Myforms'%}">My Forms</a></li>
+				</ul>
+			</div>
+			<!-- {% if "sessionid" in request.COOKIES %}
+                <a href="login" class="menu-block">Logout</a>
+            {% else %}
+                <a href="login" class="menu-block">Login</a>
+            {% endif %} -->
+		</nav>
+	</div>
+</header>
+<script src="{% static 'js/script.js' %} "></script>
+<br>
+<br>
+<br>
+{% block content %}
+{% endblock %}
+<!-- partial -->
+</body>
+</html>
