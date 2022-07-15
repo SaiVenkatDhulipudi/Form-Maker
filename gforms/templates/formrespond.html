@@ -20,16 +20,15 @@
                 <p>Descprition : {{description}}</p>
             </div> 
             {%endif%}
-            
             {% for ques  in questions%}
-                    {% if ques.Type == "Short answer" or ques.Type == "Paragraph"  %}
+                    {% if ques.questionType == "Short answer" or ques.questionType == "Paragraph"  %}
                         <div class="inputfield">
                             <label>{{ques.question}}</label>
                         </div>
                         <div class="inputfield">
-                            <textarea {{ques.required}} name="{{ques.Qid}}"class="textarea"></textarea>
+                            <textarea {{ques.required}} name="{{ques.question_id}}"class="textarea"></textarea>
                         </div>  
-                    {% elif ques.Type == "Checkbox"%}
+                    {% elif ques.questionType == "Checkbox"%}
                     <div class="inputfield">
                         <label>{{ques.question}}</label>
                         </div>
@@ -37,36 +36,36 @@
                         <div class="options">
                           {% for i in ques.options%}
                           <div class="options">
-                          <input {{ques.required}} type="checkbox" id="{{i}}" class="check" name={{ques.Qid}} value={{i}}>
+                          <input  type="checkbox" id="{{i}}" class="check" name={{ques.question_id}} value={{i}}>
                           <label for="{{i}}">{{i}}</label>
                           </div>
                           {%endfor%}
                         </div>
                      </div>
-                     {% elif ques.Type == "Multiple Choice" or ques.Type ==  "Linear scale"%}
+                     {% elif ques.questionType == "Multiple Choice" or ques.questionType ==  "Linear scale"%}
                      <div class="inputfield">
                          <label>{{ques.question}}</label>
                         </div>
                         <div class="inputfield">
-                            <div class="options">
+                            <div class="options" >
                            {% for i in ques.options%}
                            <div>
-                            <input {{ques.required}} type="radio"  class="check" name={{ques.Qid}} value={{i}}>
-                           <label for="{{ques.Qid}}">{{i}}</label>
+                            <input {{ques.required}} type="radio"  class="check" name={{ques.question_id}} value={{i}}>
+                           <label for="{{ques.question_id}}">{{i}}</label>
                            </div>
                            {%endfor%}
                         </div>
                       </div>
-                    {% elif ques.Type == "date" or ques.Type == "time" %}
+                    {% elif ques.questionType == "Date" or ques.questionType == "time" %}
                         <div class="inputfield">
                             <label>{{ques.question}}</label>
-                             <input {{ques.required}} name="{{ques.Qid}}" type="{{ques.Type}}" class="input">
+                             <input {{ques.required}} name="{{ques.question_id}}" type="{{ques.questionType}}" class="input">
                         </div>  
-                    {%elif ques.Type == "Drop-down" %}
+                    {%elif ques.questionType == "Drop-down" %}
                         <div class="inputfield">
                             <label>{{ques.question}}</label>
                                 <div class="custom_select">
-                                    <select name="{{ques.Qid}}"{{ques.required}}>
+                                    <select name="{{ques.question_id}}"{{ques.required}}>
                                         <option value="">Select</option>
                                         {% for  i in ques.options%}
                                             <option value="{{i}}">{{i}}</option>

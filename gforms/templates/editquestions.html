@@ -1,6 +1,6 @@
 {% extends "index.html" %}
 {% block content %}
-<form method="POST">
+<form method="post">
   {% csrf_token %}
 <div class="wrapper">
     <div class="title">
@@ -16,7 +16,7 @@
            <select name="qno" required >
              <option value="">Select</option>
              {% for ques in response%}
-             <option value="{{ques.Qid}}">{{ques.question}}</option>
+             <option value="{{ques.question_id}}">{{ques.question}}</option>
              {% endfor%}
            </select>
          </div>

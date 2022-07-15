@@ -1,11 +1,11 @@
 from django.db import models
 
 class Forms(models.Model):
-    Formid=models.CharField(primary_key=True,max_length=16)
-    title=models.CharField(max_length=20,null=False,default='')
+    form_id=models.CharField(primary_key=True,max_length=16)
+    title=models.CharField(max_length=20,null=False)
     description=models.CharField(max_length=200,default='')
     def __str__(self):
-        return str(self.Formid)
+        return str(self.form_id)
 
 class Question(models.Model):
     choices=(
@@ -20,30 +20,30 @@ class Question(models.Model):
     ("Date","Date"),
     ("time","time")
     )
-    formid= models.ForeignKey(Forms, on_delete=models.CASCADE)
-    Qid= models.CharField(primary_key=True,max_length=6)
+    form_id= models.ForeignKey(Forms, on_delete=models.CASCADE)
+    question_id= models.CharField(primary_key=True,max_length=6)
     question=models.CharField(max_length=200,null=False)
-    Type=models.CharField(max_length=20,choices=choices)
+    questionType=models.CharField(max_length=20,choices=choices)
     required=models.CharField(max_length=20,choices=(("required","True"),(" ","False")))
     def __str__(self):
-        return str(self.Qid)
+        return str(self.question_id)
 
 class Choice(models.Model):
-    Qid= models.ForeignKey(Question, on_delete=models.CASCADE)
+    question_id=models.ForeignKey(Question, on_delete=models.CASCADE)
     choices=models.JSONField()
 
 class Grids(models.Model):
-    Qid= models.ForeignKey(Question, on_delete=models.CASCADE)
+    question_id=models.ForeignKey(Question, on_delete=models.CASCADE)
     row=models.JSONField()
     column=models.JSONField()
     
 class Response(models.Model):
-    formid= models.ForeignKey(Forms, on_delete=models.CASCADE)
+    form_id= models.ForeignKey(Forms, on_delete=models.CASCADE)
     responseid= models.CharField(primary_key=True,max_length=8)
 
 class Formresponses(models.Model):
-    responseid=models.ForeignKey(Response, on_delete=models.CASCADE)
-    qid=models.ForeignKey(Question, on_delete=models.CASCADE)
+    response_id=models.ForeignKey(Response, on_delete=models.CASCADE)
+    question_id=models.ForeignKey(Question, on_delete=models.CASCADE)
     response=models.JSONField()
 
 # class TextAnswer(models.Model):
