@@ -150,14 +150,16 @@ body{
   font-size: 15px; 
   border: 0px;
   background:  #4070f4;
-  color: #fff;
+  color: rgb(0, 0, 0);
   cursor: pointer;
   border-radius: 3px;
   outline: none;
 }
 
 .wrapper .form .inputfield .btn:hover{
-  background: #4070f4;
+  background: #c5c5cd;
+  color:#fafafa;
+background-color:#4070f4;
 }
 
 .wrapper .form .inputfield:last-child{

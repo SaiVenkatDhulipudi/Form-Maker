@@ -136,7 +136,6 @@ class Preform(CreateView):
     def post(self,request,*args,**kwargs):
         title=request.POST["ftitle"]
         description=request.POST["fdesc"]
-
         #generating unique 16 charactered Formid for the Form
         form_id = ''.join(random.choices(string.ascii_letters + string.digits, k=16))
         #saving the form
