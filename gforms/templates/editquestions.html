@@ -13,7 +13,7 @@
           {%else%}
          <label>Select Question</label>
          <div class="custom_select">
-           <select name="qno" required >
+           <select name="ques_id" required >
              <option value="">Select</option>
              {% for ques in response%}
              <option value="{{ques.question_id}}">{{ques.question}}</option>

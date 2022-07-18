@@ -25,17 +25,18 @@ class Question(models.Model):
     question=models.CharField(max_length=200,null=False)
     questionType=models.CharField(max_length=20,choices=choices)
     required=models.CharField(max_length=20,choices=(("required","True"),(" ","False")))
+    is_deleted=models.BooleanField(default=False)
     def __str__(self):
         return str(self.question_id)
 
 class Choice(models.Model):
     question_id=models.ForeignKey(Question, on_delete=models.CASCADE)
-    choices=models.JSONField()
+    choices=models.CharField(max_length=30)
 
 class Grids(models.Model):
     question_id=models.ForeignKey(Question, on_delete=models.CASCADE)
-    row=models.JSONField()
-    column=models.JSONField()
+    row=models.CharField(max_length=30)
+    column=models.CharField(max_length=30)
     
 class Response(models.Model):
     form_id= models.ForeignKey(Forms, on_delete=models.CASCADE)
@@ -44,17 +45,6 @@ class Response(models.Model):
 class Formresponses(models.Model):
     response_id=models.ForeignKey(Response, on_delete=models.CASCADE)
     question_id=models.ForeignKey(Question, on_delete=models.CASCADE)
-    response=models.JSONField()
+    response=models.CharField(max_length=30)
 
-# class TextAnswer(models.Model):
-#     Qid=models.ForeignKey(Question,on_delete=models.CASCADE)
-#     Answer=models.CharField(max_length=200,default='')
-#     def __str__(self):
-#         return str(self.Qid)
-# class Datequestion(models.Model):
-#     Qid=models.ForeignKey(Question,on_delete=models.CASCADE)
-#     answer=models.DateField()
-
-# class ChoiceQuestion(models.Model):
-#     option=models.CharField(max_length=20,default='')
 

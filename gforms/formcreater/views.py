@@ -1,13 +1,11 @@
-from tkinter.tix import Form
-from urllib import response
+from collections import defaultdict
 from django.http import FileResponse, HttpResponse, JsonResponse,HttpResponseRedirect
-
 from django.shortcuts import render,redirect
 from xlwt import Workbook
 from .models import *
 import random, string
-from django.views.generic import TemplateView,CreateView,ListView
-
+from django.views.generic import TemplateView,CreateView,ListView,UpdateView
+from django.views import View
 
 #for Home page
 class Home(TemplateView):
@@ -23,46 +21,50 @@ class Respond(CreateView):
 
     def get_context_data(self, **kwargs):
         self.form_id=self.kwargs["form_id"]
-        instance=Forms.objects.filter(form_id=self.form_id).exists()
+        instance=Forms.objects.filter(form_id=self.form_id)
         if not instance:
             return {"message" :"Invalid Form"}
-
+        
         #getting Form Data
-        form_data=Forms.objects.filter(form_id=self.form_id).values()[0]
-        questions=list(Question.objects.filter(form_id=self.form_id).values())
-        for i in range(len(questions)):
-            del questions[i]["form_id_id"]
-            qid=questions[i]["question_id"]
+        form_data=instance.values()[0]
+        questions=list(Question.objects.filter(form_id=self.form_id,is_deleted=False).values("question_id","question","questionType","required"))
+        for question in questions:
+            qid=question["question_id"]
 
             #for choice type questions
-            if questions[i]["questionType"] in ["Multiple Choice","Checkbox","Linear scale","Drop-down"]:
+            if question["questionType"] in ["Multiple Choice","Checkbox","Linear scale","Drop-down"]:
                 """
                 Choices are stored in {"options": []} format
                 """
-                questions[i]['options']=list(Choice.objects.filter(question_id=qid).values()[0]["choices"]["options"])
+                question['options']=[options["choices"] for options in Choice.objects.filter(question_id=qid).values("choices")]
 
             #for grid type questions
-            elif questions[i]["questionType"] in ["Tick box grid","Mutiple-choice grid"]:
+            elif question["questionType"] in ["Tick box grid","Mutiple-choice grid"]:
                 """
                 Grids have two feilds #rows and #columns
                 {"rows": []}
                 {"column": []}
                 """
-                questions[i]['row']=Grids.objects.filter(question_id=qid).values()[0]['row']['rows']
-                questions[i]['column']=Grids.objects.filter(question_id=qid).values()[0]['column']['column']
+                question['row']=[options["row"] for options in Grids.objects.filter(question_id=qid).values("row")]
+                question['column']=[options["column"] for options in Grids.objects.filter(question_id=qid).values("column")]
 
         form_data["questions"]=questions
+        print(form_data)
         return form_data
         
     def post(self,request,*args,**kwargs):
-        x=Forms.objects.get(form_id=self.kwargs["form_id"])
+        form_instance=Forms.objects.get(form_id=self.kwargs["form_id"])
         resp_id=''.join(random.choices(string.ascii_letters + string.digits, k=8))
-        Response.objects.create(form_id=x,responseid=resp_id)
+        Response.objects.create(form_id=form_instance,responseid=resp_id)
         inst=Response.objects.get(responseid=resp_id)
-        for i in list(request.POST.keys())[1:]:
-            inst2=Question.objects.get(question_id=i)
-            answer=request.POST[i]
-            Formresponses.objects.create(question_id=inst2,response_id=inst,response={"answer":answer})
+        for ques_id,answer in list(request.POST.items())[1:]:
+            inst2=Question.objects.get(question_id=ques_id)
+            if type(answer) is list:
+                for value in answer:
+                    Formresponses.objects.create(question_id=inst2,response_id=inst,response=value)
+            else:
+                Formresponses.objects.create(question_id=inst2,response_id=inst,response=answer)
+
         return HttpResponse("<h1>Thanks for responding</h1>")
 
     
@@ -78,19 +80,20 @@ class Createform(CreateView):
 
         #adding for Linear Scale
         if "low" in request.POST:
-            options=[i for i in range(int(request.POST["low"]),int(request.POST["high"])+1)]
+            
             inst=Question.objects.get(question_id=request.session["qid"])
-            Choice.objects.create(question_id=inst,choices={"options":options})
+
+            for value in range(int(request.POST["low"]),int(request.POST["high"])+1):
+                Choice.objects.create(question_id=inst,choices=value)
             del request.session["qid"]
             return render(request,"CreateForm.html")
 
         #adding options
         if "value1" in request.POST:
-            options=[]
-            for i in list(request.POST.values())[1:]:
-                options.append(i)
             inst=Question.objects.get(question_id=request.session["qid"])
-            Choice.objects.create(question_id=inst,choices={"options":options})
+            for option in list(request.POST.values())[1:]:
+                Choice.objects.create(question_id=inst,choices=option)
+                
             del request.session["qid"]
             return render(request,"CreateForm.html")
 
@@ -115,10 +118,9 @@ class Createform(CreateView):
                 inst=Question.objects.get(question_id=qid)
                 """
                 Grids have two feilds #rows and #columns
-                {"rows": []}
-                {"column": []}
+                
                 """
-                Grids.objects.create(question_id=inst,row={"rows":[]},column={"column":[]})
+                Grids.objects.create(question_id=inst,row=" ",column=" ")
                 return render(request,"CreateForm.html")
 
             #for options input
@@ -136,6 +138,7 @@ class Pre_Form(CreateView):
     template_name="preform.html"
     model=Forms
     fields="__all__"
+
     def post(self,request,*args,**kwargs):
         title=request.POST["ftitle"]
         description=request.POST["fdesc"]
@@ -146,24 +149,12 @@ class Pre_Form(CreateView):
         return redirect("Createform/{}".format(form_id))
   
 
-    
 #for downloading responses
-class Download(ListView):
+class Download(View):
     def get(self,request,**kwargs):
         form_id=self.kwargs["form_id"]
         inst=Forms.objects.filter(form_id=form_id)
 
-        #checking for if forms exists or not
-        if not inst:
-            return HttpResponse("no form exists")
-
-        #creating a sheet to store responses
-        wb = Workbook()
-        sheet1 = wb.add_sheet('Sheet1')
-        questions=Question.objects.filter(form_id=form_id)
-        if not questions:
-            return HttpResponse("no questions exists") 
-        
         #checking for if the forms have responses
         resps=Response.objects.filter(form_id=form_id)
         if not resps:
@@ -171,10 +162,14 @@ class Download(ListView):
         resps=[response["responseid"] for response in resps.values("responseid")]
         
         #getting questions
+        questions=Question.objects.filter(form_id=form_id)
         questions=list(questions.values())
         ques_data=dict()
         column=0
 
+        #creating a sheet to store responses
+        wb = Workbook()
+        sheet1 = wb.add_sheet('responses')
         #writing questions on top of the sheet
         for ques in questions:
             ques_data[ques["question_id"]]=[column,ques["question"]]
@@ -182,15 +177,16 @@ class Download(ListView):
             column+=1
         row=1
         #writing answers to the sheet
-        """
-        answers are stored in this json format
-        {"answer": "3"}
-        """
+        
         for resp_id in resps:
-            answers=list(Formresponses.objects.filter(response_id=resp_id).values())
+            answers=list(Formresponses.objects.filter(response_id=resp_id).values("question_id","response"))
+            responses=defaultdict(lambda:[])
             for answer in answers:
-                column=ques_data[answer["question_id_id"]][0]
-                sheet1.write(row,column,answer["response"]["answer"])
+                responses[answer["question_id"]].append(answer["response"])
+            for question,answer in responses.items():
+                column=ques_data[question][0]
+                sheet1.write(row,column,','.join(answer))
+                
             row+=1
         
         #saving sheet with form_id as name
@@ -204,7 +200,7 @@ class Download(ListView):
 
 
 #edit option page with add questions and delete questions
-class Edit(TemplateView):
+class Edit_Page(TemplateView):
     template_name="edit.html"
     def get_context_data(self, *args, **kwargs):
         return self.kwargs
@@ -213,23 +209,20 @@ class Edit(TemplateView):
 class Edit_Questions(TemplateView):
     template_name="editquestions.html"
     model=Question
+    
     def get_context_data(self, *args, **kwargs):
         context=dict()
         form_id=(self.kwargs["form_id"])
-        context['response']=Question.objects.filter(form_id=form_id)
+        context['response']=Question.objects.filter(form_id=form_id,is_deleted=False)
         if  len(context["response"])==0:
-            return ({'message':"no questions added"})
+            return ({'message':"no questions exists in this form"})
         return context
 
     #deleting questions
     """
     using form for deleting questions
     """
+   
     def post(self,request,*args, **kwargs):
-        ques=Question.objects.get(question_id=request.POST["qno"])
-        ques.delete()
+        ques=Question.objects.filter(question_id=request.POST["ques_id"]).update(is_deleted=True)
         return  HttpResponseRedirect(self.request.path_info)
-        
-        
-    
-
