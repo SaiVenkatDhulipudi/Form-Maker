@@ -21,7 +21,8 @@ class Home(TemplateView):
 class Myforms(ListView):
     template_name= "forms.html"
     model=Forms
-    
+
+#Rendering forms to 
 class Respond(CreateView):
     template_name="formrespond.html"
     def get_context_data(self, **kwargs):
@@ -123,7 +124,7 @@ class Pre_Form(CreateView):
     def post(self,request,*args,**kwargs):
         title=request.POST["ftitle"]
         description=request.POST["fdesc"]
-        #generating unique 16 charactered Formid for the Form
+        #generating unique 16 charactered Form_id for the Form
         form_id = ''.join(random.choices(string.ascii_letters + string.digits, k=16))
         #saving the form
         Forms.objects.create(form_id=form_id,title=title,description=description)
@@ -140,6 +141,7 @@ class Download(View):
 
         if resps.status_code==404:
             return HttpResponse("no responses found")
+        
         resps=resps.json()
         #getting questions
         questions=Question.objects.filter(form_id=form_id)
