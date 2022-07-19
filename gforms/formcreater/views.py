@@ -22,7 +22,7 @@ class Myforms(ListView):
     template_name= "forms.html"
     model=Forms
 
-#Rendering forms to 
+#Rendering forms to user
 class Respond(CreateView):
     template_name="formrespond.html"
     def get_context_data(self, **kwargs):
