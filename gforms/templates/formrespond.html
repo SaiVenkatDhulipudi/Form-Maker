@@ -5,22 +5,26 @@
 <form method="POST">
     {% csrf_token %}
     <div class="wrapper">
-       
+        
         <div class="title">
             {{title}}
         </div>
         <div class="form">
+        {%if description%}
+            <div class="inputfield">
+                <p>Descprition : {{description}}</p>
+            </div> 
+        {%endif%}
+
             {% if message %}
             <div class="inputfield">
                 <label>{{message}}</label>
             </div>
             {% else %}
-            {%if description%}
-            <div class="inputfield">
-                <p>Descprition : {{description}}</p>
-            </div> 
-            {%endif%}
+                
             {% for ques  in questions%}
+            {% if ques.is_deleted == False %}
+
                     {% if ques.questionType == "Short answer" or ques.questionType == "Paragraph"  %}
                         <div class="inputfield">
                             <label>{{ques.question}}</label>
@@ -34,10 +38,10 @@
                         </div>
                         <div class="inputfield">
                         <div class="options">
-                          {% for i in ques.options%}
+                          {% for i in ques.choices%}
                           <div class="options">
-                          <input  type="checkbox" id="{{i}}" class="check" name={{ques.question_id}} value={{i}}>
-                          <label for="{{i}}">{{i}}</label>
+                          <input  type="checkbox" id="{{i.choices}}" class="check" name={{ques.question_id}} value={{i.choices}}>
+                          <label for="{{i.choices}}">{{i.choices}}</label>
                           </div>
                           {%endfor%}
                         </div>
@@ -48,15 +52,15 @@
                         </div>
                         <div class="inputfield">
                             <div class="options" >
-                           {% for i in ques.options%}
+                           {% for option in ques.choices%}
                            <div>
-                            <input {{ques.required}} type="radio"  class="check" name={{ques.question_id}} value={{i}}>
-                           <label for="{{ques.question_id}}">{{i}}</label>
+                            <input {{ques.required}} type="radio"  class="check" name={{ques.question_id}} value={{option.choices}}>
+                           <label for="{{ques.question_id}}">{{option.choices}}</label>
                            </div>
                            {%endfor%}
                         </div>
                       </div>
-                    {% elif ques.questionType == "Date" or ques.questionType == "time" %}
+                    {% elif ques.questionType == "date" or ques.questionType == "time" %}
                         <div class="inputfield">
                             <label>{{ques.question}}</label>
                              <input {{ques.required}} name="{{ques.question_id}}" type="{{ques.questionType}}" class="input">
@@ -67,20 +71,21 @@
                                 <div class="custom_select">
                                     <select name="{{ques.question_id}}"{{ques.required}}>
                                         <option value="">Select</option>
-                                        {% for  i in ques.options%}
-                                            <option value="{{i}}">{{i}}</option>
+                                        {% for  i in ques.choices%}
+                                            <option value="{{i.choices}}">{{i.choices}}</option>
                                         {%endfor %}
                                     </select>
                                 </div>
                             </div> 
-                    {%endif %}
-            {%endfor%}
-            
-            <div class="inputfield">
-                <input type="submit" value="Submit" class="btn" id="Button">
-            </div>
+                    {%endif%}
+                    {%endif%}
+                    {%endfor%}
+        <div class="inputfield">
+            <input type="submit" value="Submit" class="btn" id="Button">
         </div>
+            
         {%endif%}
+        </div>
 
     </div>
 </form>
